@@ -9,8 +9,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class OdmApplication {
     public static void main(String []args){
         SpringApplicationBuilder springApplication = new SpringApplicationBuilder();
+        springApplication.headless(false);
         springApplication.logStartupInfo(false);
         springApplication.showBanner(false);
+        springApplication.web(false);
         springApplication.sources(MainConfig.class);
         springApplication.run(args);
     }
