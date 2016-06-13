@@ -3,6 +3,7 @@ package com.odm.downloader;
 import com.github.axet.wget.SpeedInfo;
 import com.github.axet.wget.info.DownloadInfo;
 import com.odm.gui.ProgressFrame;
+import com.odm.utility.Utility;
 
 /**
  * Created by mohamed on 6/11/16.
@@ -16,120 +17,127 @@ public class DownloadNotifier implements Runnable {
     private ProgressFrame progressFrame;
     private long previouseBytes = 0;
 
-    public String formatSpeed(long s) {
-        if (s > 0.1 * 1024 * 1024 * 1024) {
+    public static String formatSpeed(long s) {
+        if (s / 1024f / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f / 1024f;
-            return String.format("%.1f GB/s", f);
-        } else if (s > 0.1 * 1024 * 1024) {
+            return String.format("%.1f ", f) + Utility.getLocalString("progress.gbPerSec");
+        } else if (s / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f;
-            return String.format("%.1f MB/s", f);
+            return String.format("%.1f ", f)+ Utility.getLocalString("progress.mbPerSec");
         } else {
             float f = s / 1024f;
-            return String.format("%.1f kb/s", f);
+            return String.format("%.1f ", f)+ Utility.getLocalString("progress.kbPerSec");
         }
     }
-    public String formatFileSize(long s) {
-        if (s > 0.1 * 1024 * 1024 * 1024) {
+    public static String formatFileSize(long s) {
+        if (s / 1024f / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f / 1024f;
-            return String.format("%.1f GB", f);
-        } else if (s > 0.1 * 1024 * 1024) {
+            return String.format("%.1f ", f) + Utility.getLocalString("progress.gb");
+        } else if (s / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f;
-            return String.format("%.1f MB", f);
+            return String.format("%.1f ", f) + Utility.getLocalString("progress.mb");
         } else {
             float f = s / 1024f;
-            return String.format("%.1f kb", f);
+            return String.format("%.1f ", f) + Utility.getLocalString("progress.kb");
         }
     }
-    public String formatDownloaded(long s,float percentage) {
+    public static String formatDownloaded(long s,float percentage) {
         String ret = "";
-        if (s > 0.1 * 1024 * 1024 * 1024) {
+        if (s / 1024f / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f / 1024f;
-            ret =  String.format("%.1f GB", f);
-        } else if (s > 0.1 * 1024 * 1024) {
+            ret =  String.format("%.1f ", f) + Utility.getLocalString("progress.gb");
+        } else if (s / 1024f / 1024f >= 1) {
             float f = s / 1024f / 1024f;
-            ret = String.format("%.1f MB", f);
+            ret = String.format("%.1f ", f) + Utility.getLocalString("progress.mb");
         } else {
             float f = s / 1024f;
-            ret =  String.format("%.1f kb", f);
+            ret =  String.format("%.1f ", f) + Utility.getLocalString("progress.kb");
         }
         String perc = String.format("( %.2f%% )",percentage);
         ret += perc;
         return ret;
     }
-    public  double calcTimeLeft(long numOfBytesDownloadedBytes,
+    public  static double calcTimeLeft(long numOfBytesDownloadedBytes,
                                       long fileLength, long previouseBytes) {
-        double transfareRateOfKiloBytes = (double) (numOfBytesDownloadedBytes - previouseBytes) / 1024.0;
-        double remainedSizeOfKiloBytes = (double) ((double) (fileLength - numOfBytesDownloadedBytes) / (double) 1024.0);
-        double timeLeft = (remainedSizeOfKiloBytes / transfareRateOfKiloBytes) / 60;
+        double transfareRateOfKiloBytes = (double) (numOfBytesDownloadedBytes - previouseBytes)  ;
+        double remainedSizeOfKiloBytes = (double) ((double) (fileLength - numOfBytesDownloadedBytes));
+        double timeLeft = (remainedSizeOfKiloBytes / transfareRateOfKiloBytes) ;
         return timeLeft;
     }
 
-    public String formatTimeLeft(double timeLeft){
+    public static String formatTimeLeft(double timeLeft){
 
-        int minuts = (int)timeLeft / 60;
-        int hours = minuts / 60;
-        int days = hours / 24;
+
+        int hours = (int)timeLeft / 60 / 60 ;
+        int minuts = (int)timeLeft / 60 % 60;
+        int seconds = (int)timeLeft % 60;
 
         String formatedTimeLeft = "";
 
-        if(days >= 1){
-            formatedTimeLeft += Integer.toString(days) + " days ";
-        }
         if(hours >= 1){
-            formatedTimeLeft += Integer.toString(hours) + " hours ";
+            formatedTimeLeft += Integer.toString(hours) + " " + Utility.getLocalString("progress.hours") + " ";
         }
         if(minuts >= 1){
-            formatedTimeLeft += Integer.toString(minuts) + " minutes ";
+            formatedTimeLeft += Integer.toString(minuts) + " " + Utility.getLocalString("progress.minutes") + " ";
         }
-        formatedTimeLeft += Integer.toString((int)timeLeft % 60) + " sec ";
+        if(seconds >= 1){
+            formatedTimeLeft += Integer.toString(seconds) + " " + Utility.getLocalString("progress.seconds") + " ";
+        }
         return formatedTimeLeft;
     }
     @Override
     public void run() {
         // notify app or save download state
         // you can extract information from DownloadInfo info;
-        progressFrame.setStatusTableRowData(info.getState().name(), 0,1);
         switch (info.getState()) {
             case EXTRACTING:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.extract"), 0,1);
             case EXTRACTING_DONE:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.extractDone"), 0,1);
                 break;
             case DONE:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.done"), 0,1);
                 // finish speed calculation by adding remaining bytes speed
                 speedInfo.end(info.getCount());
                 // print speed
                 System.out.println(String.format("%s average speed (%s)", info.getState(), formatSpeed(speedInfo.getAverageSpeed())));
                 break;
             case RETRYING:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.retry"), 0,1);
                 System.out.println(info.getState() + " " + info.getDelay());
                 break;
             case DOWNLOADING:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.downloading"), 0,1);
                 progressFrame.setStatusTableRowData(formatFileSize(info.getLength()), 1,1);
 
                 speedInfo.step(info.getCount());
                 long now = System.currentTimeMillis();
-                if (now - 1000 > last) {
+                if (now - 500 > last) {
                     last = now;
 
-                    String parts = "";
-
-                    for (DownloadInfo.Part p : info.getParts()) {
-                        if (p.getState().equals(DownloadInfo.Part.States.DOWNLOADING)) {
-                            parts += String.format("Part#%d(%.2f) ", p.getNumber(),
-                                    p.getCount() / (float) p.getLength());
-                        }
-                    }
+                    progressFrame.setPartsTableRowData(info.getParts());
 
                     float downloadedPercentage = info.getCount() / (float) info.getLength();
+
+                    progressFrame.setProgressBarValue((int)(downloadedPercentage * 100));
                     progressFrame.setFrameTitle(String.format("%.2f%% %s", downloadedPercentage * 100, progressFrame.getSavedFile().getName()));
                     progressFrame.setStatusTableRowData(formatDownloaded(info.getCount(), downloadedPercentage * 100), 2, 1);
                     progressFrame.setStatusTableRowData(formatSpeed(info.getCount() - previouseBytes), 3, 1);
-                    progressFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(),info.getLength(),previouseBytes)), 4, 1);
+                    progressFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(), info.getLength(), previouseBytes)), 4, 1);
 
-                    System.out.println(String.format("%.2f %s (%s / %s)", downloadedPercentage, parts,
-                            formatSpeed(speedInfo.getCurrentSpeed()),
-                            formatSpeed(speedInfo.getAverageSpeed())));
+                    String resumeCap = "";
+                    boolean resume = info.resume(info);
+                    if(resume){
+                        resumeCap = Utility.getLocalString("progress.resumeYes");
+                    }else {
+                        resumeCap = Utility.getLocalString("progress.resumeNo");
+                    }
+                    progressFrame.setStatusTableRowData(resumeCap, 5, 1);
+
+
+                    previouseBytes = info.getCount();
+
                 }
-                previouseBytes = info.getCount();
                 break;
             default:
                 break;

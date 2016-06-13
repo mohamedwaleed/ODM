@@ -70,8 +70,6 @@ public class MainFrame extends JFrame{
         frameOptions.setIsVisible(true);
         FrameConfigurator.configure(this, frameOptions);
         JMenuBar jMenuBar = buildMenuBar();
-        this.setJMenuBar(jMenuBar);
-
 
         JPanel jPanel1 = constructTopPanel();
         JPanel jPanel2 = constructBottomPanel();
@@ -92,6 +90,8 @@ public class MainFrame extends JFrame{
         splitPane.setBounds(0, 0, this.getWidth(), this.getHeight());
         panel.add(splitPane);
         setContentPane(panel);
+        setJMenuBar(jMenuBar);
+
     }
 
     private JPanel constructTopPanel() {

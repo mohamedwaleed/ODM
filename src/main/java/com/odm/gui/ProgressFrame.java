@@ -2,12 +2,15 @@ package com.odm.gui;
 
 
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.URLInfo;
+import com.odm.downloader.DownloadNotifier;
 import com.odm.utility.Utility;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
+import java.util.Vector;
 
 public class ProgressFrame extends JFrame {
 
@@ -168,21 +171,43 @@ public class ProgressFrame extends JFrame {
 	public void setPartsTableRowData(java.util.List<DownloadInfo.Part> parts) {
 
 		for (int i = 0; i < parts.size(); i++) {
-			if (parts.get(i).getState().equals(DownloadInfo.Part.States.DOWNLOADING)) {
+            DownloadInfo.Part.States state = parts.get(i).getState();
+			if (state.equals(DownloadInfo.Part.States.DOWNLOADING)) {
 				if (i > partsTableModel.getRowCount() - 1) {
-//					Vector<String> rowData = new Vector<String>();
-//					rowData.add(Integer.toString(i + 1));
-//					rowData.add(String.format("%.2f", DownloadInfoCalculator
-//							.calcDownloadedSize(parts.get(i).getCount())) + " MB");
-//					rowData.add(parts.get(i).getState().toString());
-//					partsTableModel.addRow(rowData);
+					Vector<String> rowData = new Vector<>();
+					rowData.add(Integer.toString(i + 1));
+					rowData.add(DownloadNotifier.formatDownloaded(parts.get(i).getCount(), parts.get(i).getCount() / (float) parts.get(i).getLength()));
+                    if(state == DownloadInfo.Part.States.DOWNLOADING){
+                        rowData.add(Utility.getLocalString("progress.downloading"));
+                    }else if(state == DownloadInfo.Part.States.DONE){
+                        rowData.add(Utility.getLocalString("progress.done"));
+                    }else if(state == DownloadInfo.Part.States.RETRYING){
+                        rowData.add(Utility.getLocalString("progress.retry"));
+                    }else if(state == DownloadInfo.Part.States.QUEUED){
+                        rowData.add(Utility.getLocalString("progress.queued"));
+                    }else if(state == DownloadInfo.Part.States.ERROR){
+                        rowData.add(Utility.getLocalString("progress.error"));
+                    }else if(state == DownloadInfo.Part.States.STOP){
+                        rowData.add(Utility.getLocalString("progress.stop"));
+                    }
+					partsTableModel.addRow(rowData);
 				} else {
-//					partsTableModel.setValueAt(Integer.toString(i + 1), i, 0);
-//					partsTableModel.setValueAt(String.format("%.2f",
-//							DownloadInfoCalculator.calcDownloadedSize(parts
-//									.get(i).getCount())) + " MB", i, 1);
-//					partsTableModel.setValueAt(parts.get(i).getState()
-//							.toString(), i, 2);
+					partsTableModel.setValueAt(Integer.toString(i + 1), i, 0);
+					partsTableModel.setValueAt(DownloadNotifier.formatDownloaded(parts.get(i).getCount(), parts.get(i).getCount() / (float) parts.get(i).getLength()), i, 1);
+					if(state == DownloadInfo.Part.States.DOWNLOADING){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.downloading"), i, 2);
+                    }else if(state == DownloadInfo.Part.States.DONE){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.done"), i, 2);
+                    }else if(state == DownloadInfo.Part.States.RETRYING){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.retry"), i, 2);
+                    }else if(state == DownloadInfo.Part.States.QUEUED){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.queued"), i, 2);
+                    }else if(state == DownloadInfo.Part.States.ERROR){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.error"), i, 2);
+                    }else if(state == DownloadInfo.Part.States.STOP){
+                        partsTableModel.setValueAt(Utility.getLocalString("progress.stop"), i, 2);
+                    }
+
 				}
 			}
 		}
