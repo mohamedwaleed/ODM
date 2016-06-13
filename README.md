@@ -7,7 +7,7 @@ Open download manger is an open source project for helping people download there
   <p>3- execute (mvn install:install-file -Dfile=wget-1.2.20.jar -DgroupId=com.github.axet -DartifactId=wget -Dversion=1.2.20 -Dpackaging=jar) without parentheses</p>
   
 ##How to run the project
- <p>execute (mvn test) without parentheses , this is by exec-maven-plugin that force the application to run after test phase of maven </p>
+ <p>execute (mvn clean compile spring-boot:run) without parentheses , this is by exec-maven-plugin that force the application to run after test phase of maven </p>
  
 ##Copyright
  <p> This project uses Wget library for downloading files but with small adjustment in the library , Thanks to Wget </p> 
