@@ -3,7 +3,10 @@ package com.odm.gui;
 
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.URLInfo;
+import com.odm.downloader.DownloadFileProcess;
 import com.odm.downloader.DownloadNotifier;
+import com.odm.gui.listeners.CancelButtonListener;
+import com.odm.gui.listeners.StopButtonListener;
 import com.odm.utility.Utility;
 
 import javax.swing.*;
@@ -28,8 +31,10 @@ public class ProgressFrame extends JFrame {
 	private String[] downloadInformation ;
 	private String[] columnNames ;
     private File savedFile;
+	private DownloadFileProcess downloadFileProcess;
 
-	public ProgressFrame() {
+	public ProgressFrame(DownloadFileProcess downloadFileProcess) {
+        this.downloadFileProcess = downloadFileProcess;
 		constructGui();
 		configurFrame();
         configureUrlLable();
@@ -88,6 +93,8 @@ public class ProgressFrame extends JFrame {
 	private void configureButtons() {
 		cancel.setBounds(370, 250, 100, 25);
 		pause.setBounds(480, 250, 100, 25);
+        cancel.addActionListener(new CancelButtonListener(downloadFileProcess));
+        pause.addActionListener(new StopButtonListener(downloadFileProcess));
 		window.add(pause);
 		window.add(cancel);
 	}
@@ -222,4 +229,12 @@ public class ProgressFrame extends JFrame {
     public void setSavedFile(File savedFile) {
         this.savedFile = savedFile;
     }
+
+	public DownloadFileProcess getDownloadFileProcess() {
+		return downloadFileProcess;
+	}
+
+	public void setDownloadFileProcess(DownloadFileProcess downloadFileProcess) {
+		this.downloadFileProcess = downloadFileProcess;
+	}
 }

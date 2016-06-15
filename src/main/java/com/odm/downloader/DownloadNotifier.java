@@ -5,6 +5,9 @@ import com.github.axet.wget.info.DownloadInfo;
 import com.odm.gui.ProgressFrame;
 import com.odm.utility.Utility;
 
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by mohamed on 6/11/16.
  */
@@ -12,6 +15,7 @@ public class DownloadNotifier implements Runnable {
 
 
     private DownloadInfo info;
+    private AtomicBoolean stop;
     private SpeedInfo speedInfo;
     private long last;
     private ProgressFrame progressFrame;
@@ -99,8 +103,8 @@ public class DownloadNotifier implements Runnable {
                 progressFrame.setStatusTableRowData(Utility.getLocalString("progress.done"), 0,1);
                 // finish speed calculation by adding remaining bytes speed
                 speedInfo.end(info.getCount());
-                // print speed
-                System.out.println(String.format("%s average speed (%s)", info.getState(), formatSpeed(speedInfo.getAverageSpeed())));
+                progressFrame.setProgressBarValue(100);
+                progressFrame.setFrameTitle(String.format("%.2f%% %s", 100.0, progressFrame.getSavedFile().getName()));
                 break;
             case RETRYING:
                 progressFrame.setStatusTableRowData(Utility.getLocalString("progress.retry"), 0,1);
@@ -115,7 +119,20 @@ public class DownloadNotifier implements Runnable {
                 if (now - 500 > last) {
                     last = now;
 
-                    progressFrame.setPartsTableRowData(info.getParts());
+                    if (info.multipart()){
+                        progressFrame.setPartsTableRowData(info.getParts());
+                    }else{
+                        // create single part download
+                        DownloadInfo.Part part = new DownloadInfo.Part();
+                        part.setStart(0);
+                        part.setEnd(info.getLength());
+                        part.setCount(0);
+                        part.setState(DownloadInfo.Part.States.DOWNLOADING);
+                        part.setCount(info.getCount());
+                        ArrayList<DownloadInfo.Part> parts = new ArrayList<>();
+                        parts.add(part);
+                        progressFrame.setPartsTableRowData(parts);
+                    }
 
                     float downloadedPercentage = info.getCount() / (float) info.getLength();
 
@@ -139,6 +156,12 @@ public class DownloadNotifier implements Runnable {
 
                 }
                 break;
+            case STOP:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.stop"), 0,1);
+                break;
+            case ERROR:
+                progressFrame.setStatusTableRowData(Utility.getLocalString("progress.error"), 0,1);
+                break;
             default:
                 break;
         }
@@ -154,5 +177,13 @@ public class DownloadNotifier implements Runnable {
 
     public void setUiFrame(ProgressFrame progressFrame) {
         this.progressFrame = progressFrame;
+    }
+
+    public AtomicBoolean getStop() {
+        return stop;
+    }
+
+    public void setStop(AtomicBoolean stop) {
+        this.stop = stop;
     }
 }

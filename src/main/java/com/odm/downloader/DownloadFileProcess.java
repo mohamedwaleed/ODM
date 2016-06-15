@@ -3,6 +3,8 @@ package com.odm.downloader;
 import com.github.axet.wget.SpeedInfo;
 import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
+import com.github.axet.wget.info.ex.DownloadInterruptedError;
+import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.odm.gui.ProgressFrame;
 
 import java.io.File;
@@ -27,26 +29,49 @@ public class DownloadFileProcess extends Thread{
     }
 
     public void download() {
-            DownloadNotifier notify = new DownloadNotifier();
-            notify.setSpeedInfo(speedInfo);
-            notify.setUiFrame(progressFrame);
+        DownloadNotifier notify = new DownloadNotifier();
+        notify.setSpeedInfo(speedInfo);
+        notify.setUiFrame(progressFrame);
 
-            // initialize url information object with or without proxy
-            // info = new DownloadInfo(url, new ProxyInfo("proxy_addr", 8080, "login", "password"));
-            info = new DownloadInfo(url);
-             notify.setInfo(info);
+        // initialize url information object with or without proxy
+        // info = new DownloadInfo(url, new ProxyInfo("proxy_addr", 8080, "login", "password"));
+        info = new DownloadInfo(url);
 
+        notify.setInfo(info);
+        notify.setStop(stop);
         // extract information from the web
-            info.extract(stop, notify);
-            // enable multipart download
-            info.enableMultipart();
-            // create wget downloader
-            WGet w = new WGet(info, targetDirectory);
-            // init speedinfo
-            speedInfo.start(0);
+        info.extract(stop, notify);
 
-            // will blocks until download finishes
-            w.download(stop, notify);
+        try {
+            downloadMultipart(notify);
+        } catch (DownloadMultipartError e) {
+            downloadSinglePart(notify);
+        } catch (RuntimeException e) {
+            if(!(e instanceof DownloadInterruptedError)) {
+                // initialize wget object
+                downloadSinglePart(notify);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void downloadSinglePart(DownloadNotifier notify) {
+        // initialize wget object
+        WGet w = new WGet(info, targetDirectory);
+        w.download(stop, notify);
+    }
+
+    private void downloadMultipart(DownloadNotifier notify) {
+        // enable multipart download
+        info.enableMultipart();
+        // init speedinfo
+        speedInfo.start(0);
+        // create wget downloader
+        WGet w = new WGet(info, targetDirectory);
+
+        // will blocks until download finishes
+        w.download(stop, notify);
     }
 
 
@@ -60,5 +85,8 @@ public class DownloadFileProcess extends Thread{
 
     public void setUiFrame(ProgressFrame progressFrame) {
         this.progressFrame = progressFrame;
+    }
+    public AtomicBoolean getStop() {
+        return stop;
     }
 }

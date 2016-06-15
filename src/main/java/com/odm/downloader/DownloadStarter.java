@@ -11,14 +11,18 @@ import java.net.URL;
  */
 public class DownloadStarter {
     public static void start(String url,File target) throws MalformedURLException {
-        ProgressFrame progressFrame = new ProgressFrame();
-        progressFrame.setUrl(url);
-        progressFrame.setSavedFile(target);
 
         DownloadFileProcess downloader = new DownloadFileProcess();
         downloader.setUrl(new URL(url));
         downloader.setTargetDirectory(target);
+
+        ProgressFrame progressFrame = new ProgressFrame(downloader);
+        progressFrame.setUrl(url);
+        progressFrame.setSavedFile(target);
+
+
         downloader.setUiFrame(progressFrame);
         downloader.start();
+
     }
 }
