@@ -16,31 +16,45 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DownloadFileProcess extends Thread{
 
+
+
     private AtomicBoolean stop = new AtomicBoolean(false);
+
+    public DownloadInfo getInfo() {
+        return info;
+    }
+
+    public void setInfo(DownloadInfo info) {
+        this.info = info;
+    }
+
     private DownloadInfo info;
     private SpeedInfo speedInfo = new SpeedInfo();
     private URL url;
     private File targetDirectory;
     private ProgressFrame progressFrame;
-
+    private DownloadNotifier notify;
     @Override
     public void run() {
         download();
     }
 
     public void download() {
-        DownloadNotifier notify = new DownloadNotifier();
-        notify.setSpeedInfo(speedInfo);
-        notify.setUiFrame(progressFrame);
+
 
         // initialize url information object with or without proxy
         // info = new DownloadInfo(url, new ProxyInfo("proxy_addr", 8080, "login", "password"));
-        info = new DownloadInfo(url);
 
-        notify.setInfo(info);
-        notify.setStop(stop);
-        // extract information from the web
-        info.extract(stop, notify);
+        if(info == null) {
+            notify = new DownloadNotifier();
+            notify.setSpeedInfo(speedInfo);
+            notify.setUiFrame(progressFrame);
+            info = new DownloadInfo(url);
+            notify.setInfo(info);
+            notify.setStop(stop);
+            // extract information from the web
+            info.extract(stop, notify);
+        }
 
         try {
             downloadMultipart(notify);
@@ -63,10 +77,13 @@ public class DownloadFileProcess extends Thread{
     }
 
     private void downloadMultipart(DownloadNotifier notify) {
-        // enable multipart download
-        info.enableMultipart();
-        // init speedinfo
-        speedInfo.start(0);
+
+        if(info.getCount() == 0) {
+            // enable multipart download
+            info.enableMultipart();
+            // init speedinfo
+            speedInfo.start(0);
+        }
         // create wget downloader
         WGet w = new WGet(info, targetDirectory);
 
@@ -88,5 +105,16 @@ public class DownloadFileProcess extends Thread{
     }
     public AtomicBoolean getStop() {
         return stop;
+    }
+    public void setStop(AtomicBoolean stop) {
+        this.stop = stop;
+    }
+
+    public DownloadNotifier getNotify() {
+        return notify;
+    }
+
+    public void setNotify(DownloadNotifier notify) {
+        this.notify = notify;
     }
 }

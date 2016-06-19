@@ -1,11 +1,16 @@
 package com.odm.gui.listeners;
 
+import com.github.axet.wget.info.DownloadInfo;
 import com.odm.downloader.DownloadFileProcess;
+import com.odm.downloader.DownloadNotifier;
+import com.odm.gui.ProgressFrame;
 import com.odm.utility.Utility;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -13,8 +18,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class StopButtonListener implements ActionListener {
     private DownloadFileProcess downloadFileProcess;
-    public StopButtonListener(DownloadFileProcess downloadFileProcess){
+    private ProgressFrame progressFrame;
+    public StopButtonListener(DownloadFileProcess downloadFileProcess,ProgressFrame progressFrame){
         this.downloadFileProcess = downloadFileProcess;
+        this.progressFrame = progressFrame;
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -24,7 +31,18 @@ public class StopButtonListener implements ActionListener {
             stopButton.setText(Utility.getLocalString("progress.button.resume"));
             downloadFileProcess.getStop().set(true);
         }else {
-            downloadFileProcess.getStop().set(false);
+            DownloadInfo oldInfo = downloadFileProcess.getInfo();
+            DownloadNotifier oldDownloadNotifier = downloadFileProcess.getNotify();
+            downloadFileProcess = new DownloadFileProcess();
+            downloadFileProcess.setNotify(oldDownloadNotifier);
+            downloadFileProcess.setInfo(oldInfo);
+            downloadFileProcess.setUiFrame(progressFrame);
+            downloadFileProcess.setTargetDirectory(progressFrame.getSavedFile());
+            try {
+                downloadFileProcess.setUrl(new URL(progressFrame.getUrl()));
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            }
             downloadFileProcess.start();
             stopButton.setText(Utility.getLocalString("progress.button.pause"));
         }

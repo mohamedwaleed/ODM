@@ -94,7 +94,7 @@ public class ProgressFrame extends JFrame {
 		cancel.setBounds(370, 250, 100, 25);
 		pause.setBounds(480, 250, 100, 25);
         cancel.addActionListener(new CancelButtonListener(downloadFileProcess));
-        pause.addActionListener(new StopButtonListener(downloadFileProcess));
+        pause.addActionListener(new StopButtonListener(downloadFileProcess,this));
 		window.add(pause);
 		window.add(cancel);
 	}
@@ -168,6 +168,9 @@ public class ProgressFrame extends JFrame {
 	public void setUrl(String url) {
 		this.url = url;
 		urlLable.setText(url);
+	}
+	public String getUrl() {
+		return this.url ;
 	}
 
 	public void setStatusTableRowData(String data, int rowNumber,
