@@ -1,6 +1,7 @@
 package com.odm.gui.listeners;
 
 import com.odm.downloader.DownloadFileProcess;
+import com.odm.gui.ProgressFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,11 +11,15 @@ import java.awt.event.ActionListener;
  */
 public class CancelButtonListener implements ActionListener{
     private DownloadFileProcess downloadFileProcess;
-    public CancelButtonListener(DownloadFileProcess downloadFileProcess){
+    private ProgressFrame progressFrame;
+
+    public CancelButtonListener(DownloadFileProcess downloadFileProcess,ProgressFrame progressFrame){
         this.downloadFileProcess = downloadFileProcess;
+        this.progressFrame = progressFrame;
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        downloadFileProcess.interrupt();
+        downloadFileProcess.getStop().set(true);
+        progressFrame.dispose();
     }
 }

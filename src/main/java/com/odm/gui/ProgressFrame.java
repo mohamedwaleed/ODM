@@ -93,7 +93,7 @@ public class ProgressFrame extends JFrame {
 	private void configureButtons() {
 		cancel.setBounds(370, 250, 100, 25);
 		pause.setBounds(480, 250, 100, 25);
-        cancel.addActionListener(new CancelButtonListener(downloadFileProcess));
+        cancel.addActionListener(new CancelButtonListener(downloadFileProcess,this));
         pause.addActionListener(new StopButtonListener(downloadFileProcess,this));
 		window.add(pause);
 		window.add(cancel);
