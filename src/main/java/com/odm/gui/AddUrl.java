@@ -2,6 +2,7 @@ package com.odm.gui;
 
 import com.odm.downloader.DownloadStarter;
 import com.odm.utility.Utility;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -18,11 +19,17 @@ public class AddUrl extends JFrame{
 
         try {
             new URL(url);
+
             if(url != null && !url.isEmpty()) {
                 JFileChooser  fileDialog = new JFileChooser();
+                fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
                 int returnVal = fileDialog.showOpenDialog(this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File savedFile = fileDialog.getSelectedFile();
+                    File currentDirectory = fileDialog.getSelectedFile();
+                    String urlFileName = FilenameUtils.getName(url);
+                    File savedFile = new File(currentDirectory.getAbsolutePath() + File.separator + urlFileName);
+
                     try {
                         DownloadStarter.start(url,savedFile);
                     } catch (MalformedURLException e) {

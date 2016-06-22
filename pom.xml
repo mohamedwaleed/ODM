@@ -61,7 +61,11 @@
             <artifactId>threads</artifactId>
             <version>0.0.13</version>
         </dependency>
-
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
     </dependencies>
 
     <build>
