@@ -4,16 +4,27 @@ import com.odm.Constants;
 import com.odm.gui.entities.FrameOptions;
 import com.odm.gui.listeners.DownloadButtonListener;
 import com.odm.utility.OdmLocal;
+import com.odm.utility.PropertyFileUtility;
 import com.odm.utility.Utility;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 
@@ -22,23 +33,43 @@ import java.util.ResourceBundle;
  */
 @Component
 public class MainFrame extends JFrame{
+
+    @Value("${app.language}")
+    private String language;
+    @Autowired
+    private PropertyFileUtility propertyFileUtility ;
     private JPanel panel = new JPanel();
     private JFrame thisFrame = this;
     private String[] columnNames ;
     private JTable table;
 
-    public MainFrame(){
-        super(Constants.APPLIACTION_TITLE);
-        Locale locale = new Locale("en", "US");
-        OdmLocal.resourceBundle = ResourceBundle.getBundle("strings", locale);
+
+    @PostConstruct
+    public void init(){
+        setTitle(Constants.APPLIACTION_TITLE);
+        try {
+            Image image = ImageIO.read(new ClassPathResource("ic_trending_down_black_24dp_2x.png").getURL());
+            setIconImage(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Locale locale = null;
+        switch (language){
+            case "Arabic":
+                locale = new Locale("ar", "EG");
+                OdmLocal.resourceBundle = ResourceBundle.getBundle("strings_ar_eg", locale);
+                break;
+            default:
+                locale = new Locale("en", "US");
+                OdmLocal.resourceBundle = ResourceBundle.getBundle("strings", locale);
+        }
         prepareGui();
+    }
+    public MainFrame(){
+
     }
 
-    public MainFrame(ResourceBundle resourceBundle){
-        super(Constants.APPLIACTION_TITLE);
-        OdmLocal.resourceBundle = resourceBundle;
-        prepareGui();
-    }
 
     public void prepareGui() {
         try {
@@ -78,7 +109,7 @@ public class MainFrame extends JFrame{
         //Create a split pane with the two scroll panes in it.
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 jPanel1, jPanel2);
-        splitPane.setDividerLocation(55);
+        splitPane.setDividerLocation(80);
 
 //Provide minimum sizes for the two components in the split pane
 
@@ -97,8 +128,19 @@ public class MainFrame extends JFrame{
     private JPanel constructTopPanel() {
 
         JButton downloadButton = new JButton(Utility.getLocalString("main.button.download"));
+        ImageIcon imageIcon = null;
+        try {
+            imageIcon = new ImageIcon(new ClassPathResource("ic_get_app_black_24dp_2x.png").getURL().getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        downloadButton.setIcon(imageIcon);
         downloadButton.addActionListener(new DownloadButtonListener());
-        downloadButton.setBounds(3, 3, 150, 50);
+        downloadButton.setBounds(3, 3, 100, 75);
+        downloadButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+        downloadButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        Font font = downloadButton.getFont();
+        downloadButton.setFont(font.deriveFont(Font.BOLD));
         JPanel jPanel1 = new JPanel();
         jPanel1.setLayout(null);
         jPanel1.add(downloadButton);
@@ -155,20 +197,36 @@ public class MainFrame extends JFrame{
         languageEnglishItem.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Properties properties = new Properties();
+                properties.setProperty("app.language","English");
+                try {
+                    propertyFileUtility.saveToDefaultPropertyFile(properties,"Settings");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 Locale locale = new Locale("en", "US");
                 OdmLocal.resourceBundle = ResourceBundle.getBundle("strings", locale);
-                thisFrame.dispose();
-                new MainFrame(OdmLocal.resourceBundle);
+                JOptionPane.showMessageDialog(null, Utility.getLocalString("language.confirm"));
+//                thisFrame.dispose();
+                // new MainFrame(OdmLocal.resourceBundle);
             }
         });
         JMenuItem languageArabicItem = new JMenuItem("Arabic");
         languageArabicItem.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Properties properties = new Properties();
+                properties.setProperty("app.language","Arabic");
+                try {
+                    propertyFileUtility.saveToDefaultPropertyFile(properties,"Settings");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 Locale locale = new Locale("ar", "EG");
                 OdmLocal.resourceBundle = ResourceBundle.getBundle("strings_ar_eg", locale);
-                thisFrame.dispose();
-                new MainFrame(OdmLocal.resourceBundle);
+                JOptionPane.showMessageDialog(null, Utility.getLocalString("language.confirm"));
+//                thisFrame.dispose();
+                // new MainFrame(OdmLocal.resourceBundle);
             }
         });
         menu.add(languageEnglishItem);

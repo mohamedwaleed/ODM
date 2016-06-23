@@ -2,7 +2,6 @@ package com.odm.gui;
 
 
 import com.github.axet.wget.info.DownloadInfo;
-import com.github.axet.wget.info.URLInfo;
 import com.odm.downloader.DownloadFileProcess;
 import com.odm.downloader.DownloadNotifier;
 import com.odm.gui.listeners.CancelButtonListener;
@@ -12,6 +11,8 @@ import com.odm.utility.Utility;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Vector;
 
@@ -144,6 +145,16 @@ public class ProgressFrame extends JFrame {
 		setVisible(true);
 		setWindowPosition();
 
+		WindowAdapter windowAdapter = new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent we)
+			{
+                downloadFileProcess.getStop().set(true);
+				setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			}
+		};
+
+		addWindowListener(windowAdapter);
 	}
 
 	private void setWindowPosition() {

@@ -18,24 +18,9 @@ public class AddUrl extends JFrame{
         String url = JOptionPane.showInputDialog(this, Utility.getLocalString("main.fileUrl"),Utility.getLocalString("main.button.download"),JOptionPane.INFORMATION_MESSAGE);
 
         try {
-            new URL(url);
-
             if(url != null && !url.isEmpty()) {
-                JFileChooser  fileDialog = new JFileChooser();
-                fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-                int returnVal = fileDialog.showOpenDialog(this);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File currentDirectory = fileDialog.getSelectedFile();
-                    String urlFileName = FilenameUtils.getName(url);
-                    File savedFile = new File(currentDirectory.getAbsolutePath() + File.separator + urlFileName);
-
-                    try {
-                        DownloadStarter.start(url,savedFile);
-                    } catch (MalformedURLException e) {
-                        JOptionPane.showMessageDialog(this,"Invalid url","Error",JOptionPane.OK_OPTION);
-                    }
-                }
+                new URL(url);
+                DownloadStarter.start(url);
             }
         } catch (MalformedURLException e) {
             JOptionPane.showMessageDialog(this, "Invalid url", "Error", JOptionPane.OK_OPTION);
