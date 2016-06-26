@@ -5,7 +5,9 @@ import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
+import com.odm.gui.MainFrame;
 import com.odm.gui.ProgressFrame;
+import com.odm.persistence.entities.Download;
 
 import java.io.File;
 import java.net.URL;
@@ -29,10 +31,21 @@ public class DownloadFileProcess extends Thread{
     }
 
     private DownloadInfo info;
+
     private SpeedInfo speedInfo = new SpeedInfo();
+
     private URL url;
+
     private File targetDirectory;
+
     private ProgressFrame progressFrame;
+
+    private MainFrame mainFrame;
+
+    private Integer mainFrameRow;
+
+    private Download download;
+
     private DownloadNotifier notify;
     @Override
     public void run() {
@@ -48,7 +61,10 @@ public class DownloadFileProcess extends Thread{
         if(info == null) {
             notify = new DownloadNotifier();
             notify.setSpeedInfo(speedInfo);
-            notify.setUiFrame(progressFrame);
+            notify.setProgressFrame(progressFrame);
+            notify.setMainFrame(mainFrame);
+            notify.setMainFrameRow(mainFrameRow);
+            notify.setDownload(download);
             info = new DownloadInfo(url);
             notify.setInfo(info);
             notify.setStop(stop);
@@ -100,7 +116,7 @@ public class DownloadFileProcess extends Thread{
         this.targetDirectory = targetDirectory;
     }
 
-    public void setUiFrame(ProgressFrame progressFrame) {
+    public void setProgressFrame(ProgressFrame progressFrame) {
         this.progressFrame = progressFrame;
     }
     public AtomicBoolean getStop() {
@@ -114,7 +130,31 @@ public class DownloadFileProcess extends Thread{
         return notify;
     }
 
+    public void setMainFrame(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+    }
+
+    public void setMainFrameRow(Integer mainFrameRow) {
+        this.mainFrameRow = mainFrameRow;
+    }
+
+    public void setDownload(Download download) {
+        this.download = download;
+    }
+
     public void setNotify(DownloadNotifier notify) {
         this.notify = notify;
+    }
+
+    public Integer getMainFrameRow() {
+        return mainFrameRow;
+    }
+
+    public Download getDownload() {
+        return download;
+    }
+
+    public MainFrame getMainFrame() {
+        return mainFrame;
     }
 }

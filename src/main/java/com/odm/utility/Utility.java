@@ -10,7 +10,7 @@ public class Utility {
     public static String getLocalString(String key){
         String localString = "";
         try {
-            localString = new String(OdmLocal.getResourceBundle().getString(key).getBytes("ISO-8859-1"));
+            localString = new String(OdmLocal.getResourceBundle().getString(key).getBytes("ISO-8859-1"),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

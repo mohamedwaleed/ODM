@@ -7,7 +7,7 @@ import com.odm.downloader.DownloadNotifier;
 import com.odm.gui.listeners.CancelButtonListener;
 import com.odm.gui.listeners.StopButtonListener;
 import com.odm.utility.Utility;
-
+import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Vector;
 
+@Component
 public class ProgressFrame extends JFrame {
 
 	private static final long serialVersionUID = -3915239322761791027L;
@@ -27,20 +28,20 @@ public class ProgressFrame extends JFrame {
 	private JProgressBar progressBar = new JProgressBar();
 	private JButton cancel ;
 	private JButton pause ;
-	private JLabel urlLable;
+	private JTextField address;
     private String url;
 	private String[] downloadInformation ;
 	private String[] columnNames ;
     private File savedFile;
 	private DownloadFileProcess downloadFileProcess;
 
-	public ProgressFrame(DownloadFileProcess downloadFileProcess) {
+
+	public void open(DownloadFileProcess downloadFileProcess){
         this.downloadFileProcess = downloadFileProcess;
-		constructGui();
-		configurFrame();
+        constructGui();
+        configurFrame();
         configureUrlLable();
 	}
-
 	private void constructGui() {
 
 		downloadInformation = new String[]{
@@ -56,7 +57,7 @@ public class ProgressFrame extends JFrame {
 
 		columnNames = new String[]{"N.", Utility.getLocalString("progress.column.downloaded"), Utility.getLocalString("progress.column.info")};
 
-		setTitle("100%");
+		setTitle("0%");
 
 		window = new JPanel();
 		window.setLayout(null);
@@ -94,16 +95,19 @@ public class ProgressFrame extends JFrame {
 	private void configureButtons() {
 		cancel.setBounds(370, 250, 100, 25);
 		pause.setBounds(480, 250, 100, 25);
-        cancel.addActionListener(new CancelButtonListener(downloadFileProcess,this));
+        cancel.addActionListener(new CancelButtonListener(downloadFileProcess, this));
         pause.addActionListener(new StopButtonListener(downloadFileProcess,this));
 		window.add(pause);
 		window.add(cancel);
 	}
 
 	private void configureUrlLable() {
-		urlLable = new JLabel(url);
-		urlLable.setBounds(20, 20, 560, 15);
-		window.add(urlLable);
+        address = new JTextField(url);
+        address.setBounds(20, 5, 560, 30);
+        address.setBackground(Color.DARK_GRAY);
+        address.setEditable(false);
+
+		window.add(address);
 	}
 
 	private void configureProgressBar() {
@@ -151,7 +155,8 @@ public class ProgressFrame extends JFrame {
 			{
                 downloadFileProcess.getStop().set(true);
 				setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			}
+                System.out.println("closed");
+            }
 		};
 
 		addWindowListener(windowAdapter);
@@ -178,7 +183,7 @@ public class ProgressFrame extends JFrame {
 
 	public void setUrl(String url) {
 		this.url = url;
-		urlLable.setText(url);
+        address.setText(url);
 	}
 	public String getUrl() {
 		return this.url ;
@@ -235,7 +240,11 @@ public class ProgressFrame extends JFrame {
 		partsTableModel.fireTableDataChanged();
 
 	}
-
+	public void completeDownload(String downloadedSize){
+		DownloadCompleteFrame downloadCompleteFrame = new DownloadCompleteFrame();
+        downloadCompleteFrame.open(url,savedFile,downloadedSize);
+        this.dispose();
+	}
     public File getSavedFile() {
         return savedFile;
     }

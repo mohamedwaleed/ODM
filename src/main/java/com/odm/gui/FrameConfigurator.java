@@ -9,8 +9,10 @@ import java.awt.*;
  * Created by mohamed on 6/10/16.
  */
 public class FrameConfigurator {
-    public static void configure(JFrame frame,FrameOptions frameOptions){
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public static void configure(JFrame frame,FrameOptions frameOptions) {
+        if (frameOptions.isDefaultCloseOperation()) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
         frame.setSize(frameOptions.getDimension());
         frame.setResizable(frameOptions.isResizable());
         frame.setVisible(frameOptions.isVisible());

@@ -3,7 +3,9 @@ package com.odm.gui.listeners;
 import com.github.axet.wget.info.DownloadInfo;
 import com.odm.downloader.DownloadFileProcess;
 import com.odm.downloader.DownloadNotifier;
+import com.odm.gui.MainFrame;
 import com.odm.gui.ProgressFrame;
+import com.odm.persistence.entities.Download;
 import com.odm.utility.Utility;
 
 import javax.swing.*;
@@ -32,11 +34,17 @@ public class StopButtonListener implements ActionListener {
             downloadFileProcess.getStop().set(true);
         }else {
             DownloadInfo oldInfo = downloadFileProcess.getInfo();
+            MainFrame mainFrame = downloadFileProcess.getMainFrame();
+            Download download = downloadFileProcess.getDownload();
+            Integer mainFramRow = downloadFileProcess.getMainFrameRow();
             DownloadNotifier oldDownloadNotifier = downloadFileProcess.getNotify();
             downloadFileProcess = new DownloadFileProcess();
             downloadFileProcess.setNotify(oldDownloadNotifier);
             downloadFileProcess.setInfo(oldInfo);
-            downloadFileProcess.setUiFrame(progressFrame);
+            downloadFileProcess.setProgressFrame(progressFrame);
+            downloadFileProcess.setMainFrame(mainFrame);
+            downloadFileProcess.setMainFrameRow(mainFramRow);
+            downloadFileProcess.setDownload(download);
             downloadFileProcess.setTargetDirectory(progressFrame.getSavedFile());
             try {
                 downloadFileProcess.setUrl(new URL(progressFrame.getUrl()));
