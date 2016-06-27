@@ -23,6 +23,7 @@ public class DownloadCompleteFrame extends JFrame{
     private File targetFile;
     private JFrame thisFrame = this;
     private String downloadedSize;
+    private JPanel panel;
 
     public void open(String url,File targetFile,String downloadedSize){
         this.url = url;
@@ -32,13 +33,7 @@ public class DownloadCompleteFrame extends JFrame{
     }
     private void prepareGui() {
         setTitle(Utility.getLocalString("downloadComplete.complete"));
-        FrameOptions frameOptions = new FrameOptions();
-        frameOptions.setDefaultCloseOperation(false);
-        frameOptions.setDimension(new Dimension(500, 250));
-        frameOptions.setIsCentered(true);
-        frameOptions.setIsResizable(false);
-        frameOptions.setIsVisible(true);
-        FrameConfigurator.configure(this, frameOptions);
+
 
         BufferedImage img = null;
         try {
@@ -47,8 +42,7 @@ public class DownloadCompleteFrame extends JFrame{
             e.printStackTrace();
         }
 
-        JPanel panel = new JPanel();
-        setContentPane(panel);
+        panel = new JPanel();
         panel.setLayout(null);
 
         ImageIcon icon = new ImageIcon(img);
@@ -65,18 +59,16 @@ public class DownloadCompleteFrame extends JFrame{
         urlLable.setBounds(10, 60, 150, 20);
 
         JTextField address = new JTextField(url);
-        address.setBounds(10, 80, this.getWidth() - 20, 30);
+        address.setBounds(10, 80, 480, 30);
         address.setEditable(false);
-        address.setBackground(new Color(69, 68, 73));
 
 
         JLabel fileLable = new JLabel(Utility.getLocalString("downloadComplete.file"));
         fileLable.setBounds(10, 120, 150, 20);
 
         JTextField fileAddress = new JTextField(targetFile.getAbsolutePath());
-        fileAddress.setBounds(10, 140, this.getWidth() - 20, 30);
+        fileAddress.setBounds(10, 140, 480, 30);
         fileAddress.setEditable(false);
-        fileAddress.setBackground(new Color(69, 68, 73));
 
 
         JButton openFolder = new JButton(Utility.getLocalString("downloadComplete.openFolder"));
@@ -110,6 +102,19 @@ public class DownloadCompleteFrame extends JFrame{
         panel.add(fileAddress);
         panel.add(openFolder);
         panel.add(closeButton);
+
+
+        setContentPane(panel);
+
+
+        FrameOptions frameOptions = new FrameOptions();
+        frameOptions.setDefaultCloseOperation(false);
+        frameOptions.setDimension(new Dimension(500, 250));
+        frameOptions.setIsCentered(true);
+        frameOptions.setIsResizable(false);
+        frameOptions.setIsVisible(true);
+        FrameConfigurator.configure(this, frameOptions);
+
     }
 
 }

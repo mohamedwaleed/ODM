@@ -104,7 +104,6 @@ public class ProgressFrame extends JFrame {
 	private void configureUrlLable() {
         address = new JTextField(url);
         address.setBounds(20, 5, 560, 30);
-        address.setBackground(Color.DARK_GRAY);
         address.setEditable(false);
 
 		window.add(address);

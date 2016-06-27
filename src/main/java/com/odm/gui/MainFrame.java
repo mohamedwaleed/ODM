@@ -100,13 +100,7 @@ public class MainFrame extends JFrame{
                 Utility.getLocalString("main.downloadList.six"),
                 Utility.getLocalString("main.downloadList.seventh")};
 
-        FrameOptions frameOptions = new FrameOptions();
-        frameOptions.setDefaultCloseOperation(true);
-        frameOptions.setDimension(new Dimension(900, 500));
-        frameOptions.setIsCentered(true);
-        frameOptions.setIsResizable(true);
-        frameOptions.setIsVisible(true);
-        FrameConfigurator.configure(this, frameOptions);
+
         JMenuBar jMenuBar = buildMenuBar();
 
         JPanel jPanel1 = constructTopPanel();
@@ -126,9 +120,17 @@ public class MainFrame extends JFrame{
         panel.setLayout(new BorderLayout());
         splitPane.setBounds(0, 0, this.getWidth(), this.getHeight());
         panel.add(splitPane);
+
         setContentPane(panel);
         setJMenuBar(jMenuBar);
 
+        FrameOptions frameOptions = new FrameOptions();
+        frameOptions.setDefaultCloseOperation(true);
+        frameOptions.setDimension(new Dimension(900, 500));
+        frameOptions.setIsCentered(true);
+        frameOptions.setIsResizable(true);
+        frameOptions.setIsVisible(true);
+        FrameConfigurator.configure(this, frameOptions);
         getDownloadList();
 
     }
