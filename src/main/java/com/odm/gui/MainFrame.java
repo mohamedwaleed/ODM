@@ -55,8 +55,8 @@ public class MainFrame extends JFrame{
 
     private DefaultTableModel tableModel;
 
-    @PostConstruct
-    public void init(){
+
+    public void open(){
         setTitle(Constants.APPLIACTION_TITLE);
         try {
             Image image = ImageIO.read(new File("images/ic_trending_down_black_24dp_2x.png"));
@@ -78,7 +78,6 @@ public class MainFrame extends JFrame{
         prepareGui();
 
     }
-
     public void prepareGui() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
