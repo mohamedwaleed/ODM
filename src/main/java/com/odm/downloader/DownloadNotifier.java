@@ -146,7 +146,13 @@ public class DownloadNotifier implements Runnable {
                 mainFrame.setStatusTableRowData(Utility.getLocalString("progress.downloading"), mainFrameRow,2);
                 download.setStatus(Utility.getLocalString("progress.downloading"));
 
-                progressFrame.setStatusTableRowData(formatFileSize(info.getLength()), 1, 1);
+                if(info.getLength() == null){
+                    progressFrame.setStatusTableRowData(Utility.getLocalString("progress.info.fileSize.unknown"), 1, 1);
+                }
+                else {
+                    progressFrame.setStatusTableRowData(formatFileSize(info.getLength()), 1, 1);
+                }
+
                 mainFrame.setStatusTableRowData(formatFileSize(info.getLength()), mainFrameRow,1);
                 download.setSize(formatFileSize(info.getLength()));
                 speedInfo.step(info.getCount());
