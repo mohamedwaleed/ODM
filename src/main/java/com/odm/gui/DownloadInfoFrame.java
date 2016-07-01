@@ -1,5 +1,6 @@
 package com.odm.gui;
 
+import com.github.axet.wget.info.DownloadInfo;
 import com.odm.gui.entities.FrameOptions;
 import com.odm.gui.listeners.StartDownloadButtonListener;
 import com.odm.persistence.services.DownloadService;
@@ -35,10 +36,12 @@ public class DownloadInfoFrame extends JFrame{
 
     private JPanel panel;
 
-    public void open(String url,File targetFile,String fileSize){
+    private DownloadInfo downloadInfo;
+    public void open(String url,File targetFile,String fileSize,DownloadInfo downloadInfo){
         this.url = url;
         this.targetFile = targetFile;
         this.fileSize = fileSize;
+        this.downloadInfo = downloadInfo;
         prepareGui();
     }
     private void prepareGui() {
@@ -87,7 +90,7 @@ public class DownloadInfoFrame extends JFrame{
                 int returnVal = fileDialog.showOpenDialog(null);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File currentDirectory = fileDialog.getSelectedFile();
-                    String urlFileName = FilenameUtils.getName(url);
+                    String urlFileName = downloadInfo.getContentFilename();
                     File target = new File(currentDirectory.getAbsolutePath() + File.separator + urlFileName);
                     targetFile = target;
                     fileAddress.setText(target.getAbsolutePath());

@@ -43,8 +43,8 @@ public class DownloadStarter {
           if (fileSize != null) {
               formatedFileSize = formatFileSize(info.getLength());
           }
-          String urlFileName = FilenameUtils.getName(url);
-          downloadInfoFrame.open(url,new File(urlFileName),formatedFileSize);
+          String urlFileName = info.getContentFilename();
+          downloadInfoFrame.open(url,new File(urlFileName),formatedFileSize,info);
 
 
     }
