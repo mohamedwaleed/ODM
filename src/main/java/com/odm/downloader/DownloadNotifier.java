@@ -141,20 +141,23 @@ public class DownloadNotifier implements Runnable {
                 break;
             case DOWNLOADING:
                 isDownloading = true;
-
+                Long fileSize = info.getLength();
                 progressFrame.setStatusTableRowData(Utility.getLocalString("progress.downloading"), 0,1);
-                mainFrame.setStatusTableRowData(Utility.getLocalString("progress.downloading"), mainFrameRow,2);
+                mainFrame.setStatusTableRowData(Utility.getLocalString("progress.downloading"), mainFrameRow, 2);
                 download.setStatus(Utility.getLocalString("progress.downloading"));
 
-                if(info.getLength() == null){
+                if(fileSize == null){
                     progressFrame.setStatusTableRowData(Utility.getLocalString("progress.info.fileSize.unknown"), 1, 1);
+                    mainFrame.setStatusTableRowData(Utility.getLocalString("progress.info.fileSize.unknown"), mainFrameRow, 1);
+                    download.setSize(Utility.getLocalString("progress.info.fileSize.unknown"));
                 }
                 else {
-                    progressFrame.setStatusTableRowData(formatFileSize(info.getLength()), 1, 1);
+                    progressFrame.setStatusTableRowData(formatFileSize(fileSize), 1, 1);
+                    mainFrame.setStatusTableRowData(formatFileSize(fileSize), mainFrameRow, 1);
+                    download.setSize(formatFileSize(fileSize));
                 }
 
-                mainFrame.setStatusTableRowData(formatFileSize(info.getLength()), mainFrameRow,1);
-                download.setSize(formatFileSize(info.getLength()));
+
                 speedInfo.step(info.getCount());
                 long now = System.currentTimeMillis();
                 if (now - 500 > last) {
@@ -166,7 +169,11 @@ public class DownloadNotifier implements Runnable {
                         // create single part download
                         DownloadInfo.Part part = new DownloadInfo.Part();
                         part.setStart(0);
-                        part.setEnd(info.getLength());
+                        if(fileSize != null) {
+                            part.setEnd(fileSize);
+                        }else {
+                            part.setEnd(0);
+                        }
                         part.setCount(0);
                         part.setState(DownloadInfo.Part.States.DOWNLOADING);
                         part.setCount(info.getCount());
@@ -175,22 +182,36 @@ public class DownloadNotifier implements Runnable {
                         progressFrame.setPartsTableRowData(parts);
                     }
 
-                    float downloadedPercentage = info.getCount() / (float) info.getLength();
+                    float downloadedPercentage = 0.0f ;
 
+                    if(fileSize != null) {
+                        downloadedPercentage = info.getCount() / (float) info.getLength();
+                    }
                     progressFrame.setProgressBarValue((int)(downloadedPercentage * 100));
                     progressFrame.setFrameTitle(String.format("%.2f%% %s", downloadedPercentage * 100, progressFrame.getSavedFile().getName()));
                     progressFrame.setStatusTableRowData(formatDownloaded(info.getCount(), downloadedPercentage * 100), 2, 1);
                     progressFrame.setStatusTableRowData(formatSpeed(speedInfo.getCurrentSpeed()), 3, 1);
-                    progressFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(), info.getLength(), previouseBytes)), 4, 1);
-
+                    if(fileSize != null) {
+                        progressFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(), fileSize, previouseBytes)), 4, 1);
+                    }else {
+                        progressFrame.setStatusTableRowData(Utility.getLocalString("progress.info.fileSize.unknown"), 4, 1);
+                    }
                     mainFrame.setStatusTableRowData(formatDownloaded(info.getCount(), downloadedPercentage * 100), mainFrameRow, 6);
                     mainFrame.setStatusTableRowData(formatSpeed(speedInfo.getCurrentSpeed()), mainFrameRow,4);
-                    mainFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(), info.getLength(), previouseBytes)), mainFrameRow,3);
+                    if(fileSize != null) {
+                        mainFrame.setStatusTableRowData(formatTimeLeft(calcTimeLeft(info.getCount(), fileSize, previouseBytes)), mainFrameRow, 3);
+                    }else{
+                        mainFrame.setStatusTableRowData(Utility.getLocalString("progress.info.fileSize.unknown"), mainFrameRow, 3);
+                    }
                     mainFrame.setStatusTableRowData(String.format("%.2f%%", downloadedPercentage * 100),mainFrameRow,5);
 
                     download.setDownloaded(formatDownloaded(info.getCount(), downloadedPercentage * 100));
                     download.setTransferRate(formatSpeed(speedInfo.getCurrentSpeed()));
-                    download.setTimeLeft(formatTimeLeft(calcTimeLeft(info.getCount(), info.getLength(), previouseBytes)));
+                    if(fileSize != null) {
+                        download.setTimeLeft(formatTimeLeft(calcTimeLeft(info.getCount(), fileSize, previouseBytes)));
+                    }else{
+                        download.setTimeLeft(Utility.getLocalString("progress.info.fileSize.unknown"));
+                    }
                     download.setProgress(String.format("%.2f%%", downloadedPercentage * 100));
 
                     String resumeCap = "";

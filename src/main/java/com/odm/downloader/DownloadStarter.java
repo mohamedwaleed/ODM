@@ -40,63 +40,12 @@ public class DownloadStarter {
 
           String formatedFileSize = Utility.getLocalString("progress.info.fileSize.unknown");
           Long fileSize = info.getLength();
-          if (fileSize != null){
+          if (fileSize != null) {
               formatedFileSize = formatFileSize(info.getLength());
-              String urlFileName = FilenameUtils.getName(url);
-              downloadInfoFrame.open(url,new File(urlFileName),formatedFileSize);
           }
+          String urlFileName = FilenameUtils.getName(url);
+          downloadInfoFrame.open(url,new File(urlFileName),formatedFileSize);
 
-//        JFileChooser fileDialog = new JFileChooser();
-//        fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//
-//        int returnVal = fileDialog.showOpenDialog(null);
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//            File currentDirectory = fileDialog.getSelectedFile();
-//            String urlFileName = FilenameUtils.getName(url);
-//            File target = new File(currentDirectory.getAbsolutePath() + File.separator + urlFileName);
-//
-//
-//            DownloadFileProcess downloader = new DownloadFileProcess();
-//            downloader.setUrl(new URL(url));
-//            downloader.setTargetDirectory(target);
-//
-//            ProgressFrame progressFrame = new ProgressFrame();
-//            progressFrame.open(downloader);
-//            progressFrame.setUrl(url);
-//            progressFrame.setSavedFile(target);
-//
-//
-//
-//
-//            Download download = new Download();
-//            download.setFileName(target.getName());
-//            download.setDownloaded("");
-//            download.setProgress("");
-//            download.setStatus("");
-//            download.setSize("");
-//            download.setTimeLeft("");
-//            download.setTransferRate("");
-//            download = downloadService.saveDownload(download);
-//
-//
-//            Vector<String>vector= new Vector<>();
-//            vector.add(target.getName());
-//            vector.add("");
-//            vector.add("");
-//            vector.add("");
-//            vector.add("");
-//            vector.add("");
-//            vector.add("");
-//            int row = mainFrame.addDownloadListRecord(vector);
-//
-//            downloader.setProgressFrame(progressFrame);
-//            downloader.setMainFrame(mainFrame);
-//            downloader.setMainFrameRow(row);
-//            downloader.setDownload(download);
-//            downloader.start();
-//        }
-//
-//
 
     }
     public static String formatFileSize(long s) {
