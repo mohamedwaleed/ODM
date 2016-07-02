@@ -1,5 +1,6 @@
 package com.odm.downloader;
 
+import com.github.axet.wget.WGet;
 import com.github.axet.wget.info.DownloadInfo;
 import com.odm.gui.DownloadInfoFrame;
 import com.odm.gui.MainFrame;
@@ -43,10 +44,9 @@ public class DownloadStarter {
           if (fileSize != null) {
               formatedFileSize = formatFileSize(info.getLength());
           }
-          String urlFileName = info.getContentFilename();
-          downloadInfoFrame.open(url,new File(urlFileName),formatedFileSize,info);
+          File targetDirectory = WGet.calcName(info, new File(System.getProperty("user.dir")));
 
-
+          downloadInfoFrame.open(url,targetDirectory,formatedFileSize,info);
     }
     public static String formatFileSize(long s) {
         if (s / 1024f / 1024f / 1024f >= 1) {
